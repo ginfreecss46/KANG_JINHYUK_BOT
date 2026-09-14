@@ -79,6 +79,32 @@ module.exports = {
         await replyWithImage(messageText, { mentions });
     },
 
+    async add(sock, msg, args, replyWithImage) {
+        const from = msg.key.remoteJid;
+        const sender = msg.key.participant || msg.participant;
+
+        if (!await this.authOk(sock, from, sender)) {
+            return replyWithImage('🚫 Réservé aux admins.');
+        }
+
+        const mentioned = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid || [];
+        const quoted = msg.message?.extendedTextMessage?.contextInfo?.participant;
+        const targets = args.map(n => n.replace(/[^\d]/g, '') + '@s.whatsapp.net')
+            .concat(mentioned, quoted ? [quoted] : []);
+
+        if (targets.length === 0) {
+            return replyWithImage("⚠️ Utilisation : .add <numéro> ou mentionnez / répondez à quelqu'un pour l'ajouter au groupe.");
+        }
+
+        try {
+            await sock.groupParticipantsUpdate(from, targets, 'add');
+            await replyWithImage(`✅ ${targets.length} membre(s) ajouté(s) au groupe.`);
+        } catch (err) {
+            console.error(err);
+            await replyWithImage('❌ Impossible d\'ajouter ces membres (le numéro doit avoir accepté d\'être ajouté, ou le groupe est plein).');
+        }
+    },
+
     async kick(sock, msg, args, replyWithImage) {
         const from = msg.key.remoteJid;
         const sender = msg.key.participant || msg.participant;

@@ -129,7 +129,7 @@ module.exports = {
         }
     },
 
-    async add(sock, msg, replyWithImage) {
+    async s(sock, msg, replyWithImage) {
         const from = msg.key.remoteJid;
         const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
         const imageMsg = quoted?.imageMessage || msg.message?.imageMessage;

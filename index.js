@@ -89,6 +89,34 @@ async function startBot() {
         const args = body.slice(1).trim().split(/ +/);
         const command = args.shift().toLowerCase();
 
+        // Effet de chargement avant l'exécution d'une commande ([███] 10% ... 100%)
+        const LOADING_COMMANDS = new Set(['tag', 'tagall', 'kick', 'kickall', 'add', 'purge', 'sasaki', 'promote', 'demote', 'reset', 'tgs', 'play', 'take', 's', 'save', 'pair', 'delpair']);
+
+        const showLoading = async (cmd) => {
+            if (!LOADING_COMMANDS.has(cmd)) return;
+            try {
+                const { key } = await sock.sendMessage(from, {
+                    text: `⚡ *Exécution : .${cmd}*\n[░░░░░░░░░░] 0%\n━━━━━━━━━━\n🖋️ *𝔳𝔬𝔦𝔡_𝔰𝔱𝔦𝔩𝔢𝔰_𝔰𝔞𝔰𝔞𝔨𝔦*`
+                }, { quoted: msg });
+
+                for (let p = 10; p <= 100; p += 10) {
+                    const filled = p / 10;
+                    const bar = '█'.repeat(filled) + '░'.repeat(10 - filled);
+                    await sock.sendMessage(from, {
+                        text: `⚡ *Exécution : .${cmd}*\n[${bar}] ${p}%\n━━━━━━━━━━\n🖋️ *𝔳𝔬𝔦𝔡_𝔰𝔱𝔦𝔩𝔢𝔰_𝔰𝔞𝔰𝔞𝔨𝔦*`,
+                        edit: key
+                    }, { quoted: msg });
+                    await new Promise((res) => setTimeout(res, 100));
+                }
+
+                await sock.sendMessage(from, { delete: key });
+            } catch (err) {
+                // silencieux : l'effet est optionnel
+            }
+        };
+
+        await showLoading(command);
+
         // Helper pour envoyer un message avec l'image par défaut pour chaque commande
         const replyWithImage = async (caption, extraOptions = {}) => {
             const fullCaption = caption + SIGNATURE;
@@ -160,7 +188,7 @@ async function startBot() {
    ◈  .take
       └─ STICKER ═══▶  RENAME
 
-   ◈  .add
+   ◈  .s
       └─ IMAGE ═════▶  STICKER
 
 
@@ -195,6 +223,9 @@ async function startBot() {
 
    ◈  .kickall
       └─ ACTION  ═══▶  CLEAN
+
+   ◈  .add <numéro>
+      └─ ACTION  ═══▶  INVITE
 
    ◈  .purge
       └─ ACTION  ═══▶  EXILE
@@ -242,7 +273,7 @@ async function startBot() {
 │       [██████████] 100%          │
 │                                  │
 │       ⚡ SYSTEM OPERATIONAL       │
-│       ◈ 23 COMMANDS LOADED       │
+│       ◈ 24 COMMANDS LOADED       │
 │                                  │
 ╰──────────────────────────────────╯
 `;
@@ -267,8 +298,8 @@ async function startBot() {
             case 'take':
                 await mediaCmds.take(sock, msg, replyWithImage);
                 break;
-            case 'add':
-                await mediaCmds.add(sock, msg, replyWithImage);
+            case 's':
+                await mediaCmds.s(sock, msg, replyWithImage);
                 break;
 
             // Statuts
@@ -288,6 +319,9 @@ async function startBot() {
                 break;
             case 'kickall':
                 if (isGroup) await adminCmds.kickall(sock, msg, replyWithImage);
+                break;
+            case 'add':
+                if (isGroup) await adminCmds.add(sock, msg, args, replyWithImage);
                 break;
             case 'purge':
                 if (isGroup) await adminCmds.purge(sock, msg, replyWithImage);

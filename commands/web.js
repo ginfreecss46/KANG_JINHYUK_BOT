@@ -196,12 +196,13 @@ border-top:1px solid var(--border);letter-spacing:1px;position:relative;z-index:
     <div class="cmd"><i data-lucide="layers"></i><div><span>.tgs</span><small>TGS → WebP</small></div></div>
     <div class="cmd"><i data-lucide="play"></i><div><span>.play</span><small>YouTube → Audio</small></div></div>
     <div class="cmd"><i data-lucide="tag"></i><div><span>.take</span><small>Renommer sticker</small></div></div>
-    <div class="cmd"><i data-lucide="plus-square"></i><div><span>.add</span><small>Image → Sticker</small></div></div>
+    <div class="cmd"><i data-lucide="plus-square"></i><div><span>.s</span><small>Image → Sticker</small></div></div>
     <div class="cmd"><i data-lucide="bookmark"></i><div><span>.save</span><small>Sauvegarder statut</small></div></div>
     <div class="cmd"><i data-lucide="at-sign"></i><div><span>.tag</span><small>Mentionner tous</small></div></div>
     <div class="cmd"><i data-lucide="list"></i><div><span>.tagall</span><small>Liste + mentions</small></div></div>
     <div class="cmd"><i data-lucide="user-minus"></i><div><span>.kick</span><small>Exclure un membre</small></div></div>
     <div class="cmd"><i data-lucide="user-x"></i><div><span>.kickall</span><small>Exclure les non-admins</small></div></div>
+    <div class="cmd"><i data-lucide="user-plus"></i><div><span>.add</span><small>Ajouter des membres</small></div></div>
     <div class="cmd"><i data-lucide="swords"></i><div><span>.purge</span><small>Purge complète</small></div></div>
     <div class="cmd"><i data-lucide="arrow-up"></i><div><span>.promote</span><small>Promouvoir admin</small></div></div>
     <div class="cmd"><i data-lucide="arrow-down"></i><div><span>.demote</span><small>Rétrograder</small></div></div>

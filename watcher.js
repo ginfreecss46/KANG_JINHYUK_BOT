@@ -7,15 +7,21 @@ const WATCH_EXT = ['.js', '.json', '.env'];
 
 let child = null;
 let restartTimer = null;
+let crashCount = 0;
+let lastStart = 0;
 
 function startBot() {
+    const now = Date.now();
+    if (now - lastStart < 10000) crashCount++;
+    else crashCount = 0;
+    lastStart = now;
+
+    const delay = crashCount >= 5 ? 10000 : 800;
+
     child = spawn('node', ['index.js'], { stdio: 'inherit' });
     child.on('exit', (code, signal) => {
-        console.log(`\n🔄 Processus du bot arrêté (code: ${code}, signal: ${signal})`);
-        if (signal !== 'SIGKILL') {
-            console.log('🤖 Redémarrage automatique...');
-            startBot();
-        }
+        console.log(`\n🔄 Processus du bot arrêté (code: ${code}, signal: ${signal}) — redémarrage dans ${delay}ms`);
+        setTimeout(startBot, delay);
     });
 }
 

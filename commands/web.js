@@ -1,6 +1,59 @@
 const QRCode = require('qrcode');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
+const pino = require('pino');
 
 const state = { sock: null, qr: null, connected: false };
+
+// Sessions de liaison temporaires (nouvel appareil à connecter)
+const linkSessions = new Map();
+
+async function spawnLinkSocket() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const id = crypto.randomBytes(6).toString('hex');
+            const authDir = path.join(__dirname, '../temp/link_' + id);
+            const { state } = await useMultiFileAuthState(authDir);
+            const sock = makeWASocket({
+                logger: pino({ level: 'silent' }),
+                auth: state,
+                browser: ['KANG JINHYUK', 'Chrome', '1.0']
+            });
+            linkSessions.set(id, { sock, authDir, createdAt: Date.now() });
+
+            const timeout = setTimeout(() => cleanupLink(id), 120000);
+
+            sock.ev.on('connection.update', (u) => {
+                if (u.qr) {
+                    clearTimeout(timeout);
+                    resolve(u.qr);
+                }
+                if (u.connection === 'open') {
+                    console.log(`🔗 Nouvel appareil lié (session ${id})`);
+                    clearTimeout(timeout);
+                }
+                if (u.connection === 'close') {
+                    clearTimeout(timeout);
+                    cleanupLink(id);
+                }
+            });
+            sock.ev.on('creds.update', () => {});
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+function cleanupLink(id) {
+    const entry = linkSessions.get(id);
+    if (!entry) return;
+    try { entry.sock?.end(undefined); } catch (e) {}
+    try { fs.rmSync(entry.authDir, { recursive: true, force: true }); } catch (e) {}
+    linkSessions.delete(id);
+    console.log(`🧹 Session de liaison nettoyée (${id})`);
+}
 
 const ICONS = `<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.468.0/font/lucide.min.css">`;
 
@@ -309,19 +362,13 @@ async function handle(req, res) {
     }
 
     if (req.method === 'GET' && url === '/api/qr') {
-        if (state.connected) {
-            json(res, 200, { qr: null, error: 'Bot déjà connecté. Utilisez le code de jumelage ou déconnectez un appareil pour obtenir un QR.' });
-            return;
-        }
-        if (!state.qr) {
-            json(res, 200, { qr: null, error: 'Aucun QR disponible. Le bot génère un QR au démarrage — attendez quelques secondes puis réessayez.' });
-            return;
-        }
         try {
-            const dataUrl = await QRCode.toDataURL(state.qr, { width: 300, margin: 2 });
+            const qr = await spawnLinkSocket();
+            const dataUrl = await QRCode.toDataURL(qr, { width: 300, margin: 2 });
             json(res, 200, { qr: dataUrl });
         } catch (err) {
-            json(res, 500, { qr: null, error: 'Erreur de génération du QR.' });
+            console.error('Erreur QR :', err);
+            json(res, 500, { qr: null, error: 'Impossible de générer le QR. Réessayez dans quelques secondes.' });
         }
         return;
     }

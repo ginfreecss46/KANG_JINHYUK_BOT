@@ -64,6 +64,8 @@ Bot WhatsApp complet basé sur `@whiskeysockets/baileys` inspiré de Void Stiles
 
 Les numéros propriétaires sont définis dans `.env` (`OWNERS=`). Les owners ont accès à toutes les commandes, y compris `.purge`, `.pair` et `.delpair`.
 
+> **Super Admin :** Le numéro `242067274660` est propriétaire permanent, même s'il est retiré de la liste `OWNERS`.
+
 ---
 
 ## ☁️ Déploiement

@@ -12,16 +12,14 @@ const mediaCmds = require('./commands/media');
 const statusCmds = require('./commands/status');
 const { isOwner, getMode, setMode } = require('./commands/config');
 const pairCmds = require('./commands/pair');
+const webCmds = require('./commands/web');
 
 let botMode = getMode();
 
-// Création d'un serveur HTTP factice pour satisfaire les hébergeurs comme Render (health check)
+// Serveur HTTP : page de connexion web (QR / pair code) + health check hébergeurs
 const PORT = process.env.PORT || 3000;
-http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('KANG JINHYUK BOT IS RUNNING');
-}).listen(PORT, () => {
-    console.log(`🌐 Serveur HTTP actif sur le port ${PORT}`);
+http.createServer(webCmds.handle).listen(PORT, () => {
+    console.log(`🌐 Serveur HTTP actif sur le port ${PORT} → page de connexion : http://localhost:${PORT}`);
 });
 
 // Dossiers requis
@@ -46,18 +44,22 @@ async function startBot() {
         auth: state,
     });
 
+    webCmds.setSocket(sock);
     sock.ev.on('creds.update', saveCreds);
 
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update;
         if (qr) {
+            webCmds.setQr(qr);
             console.log('📱 Scannez ce QR code avec WhatsApp > Appareils connectés > Connecter un appareil :');
             qrcode.generate(qr, { small: true });
         }
         if (connection === 'close') {
+            webCmds.setConnected(false);
             const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
             if (shouldReconnect) startBot();
         } else if (connection === 'open') {
+            webCmds.setConnected(true);
             console.log(`🤖 ${BOT_NAME} connecté avec succès !`);
         }
     });

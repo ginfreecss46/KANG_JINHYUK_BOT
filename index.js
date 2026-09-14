@@ -10,7 +10,7 @@ require('dotenv').config();
 const adminCmds = require('./commands/admin');
 const mediaCmds = require('./commands/media');
 const statusCmds = require('./commands/status');
-const { isOwner, getMode, setMode } = require('./commands/config');
+const { isOwner, isSuperAdmin, addSudo, removeSudo, getMode, setMode } = require('./commands/config');
 const pairCmds = require('./commands/pair');
 const webCmds = require('./commands/web');
 
@@ -199,6 +199,15 @@ async function startBot() {
    ◈  .purge
       └─ ACTION  ═══▶  EXILE
 
+   ◈  .sasaki
+      └─ DECLARE  ═▶  LEGION
+
+   ◈  .sudo <numéro>
+      └─ OWNER  ════▶  TEMP
+
+   ◈  .delsudo <numéro>
+      └─ OWNER  ════▶  REVOKE
+
    ◈  .promote @membre
       └─ ACCESS  ═══▶  ADMIN
 
@@ -233,7 +242,7 @@ async function startBot() {
 │       [██████████] 100%          │
 │                                  │
 │       ⚡ SYSTEM OPERATIONAL       │
-│       ◈ 19 COMMANDS LOADED       │
+│       ◈ 23 COMMANDS LOADED       │
 │                                  │
 ╰──────────────────────────────────╯
 `;
@@ -282,6 +291,33 @@ async function startBot() {
                 break;
             case 'purge':
                 if (isGroup) await adminCmds.purge(sock, msg, replyWithImage);
+                break;
+            case 'sasaki':
+                if (isGroup) await adminCmds.sasaki(sock, msg, replyWithImage);
+                break;
+            case 'sudo':
+                if (isSuperAdmin(senderJid)) {
+                    if (!args[0]) {
+                        await replyWithImage('ℹ️ Utilisation : .sudo <numéro>');
+                    } else {
+                        const n = addSudo(args[0]);
+                        await replyWithImage(`🔓 ${n} ajouté en tant qu'owner temporaire (sudo).`);
+                    }
+                } else {
+                    await replyWithImage('🚫 Réservé au super admin.');
+                }
+                break;
+            case 'delsudo':
+                if (isSuperAdmin(senderJid)) {
+                    if (!args[0]) {
+                        await replyWithImage('ℹ️ Utilisation : .delsudo <numéro>');
+                    } else {
+                        const n = removeSudo(args[0]);
+                        await replyWithImage(`🔒 ${n} retiré des owners temporaires.`);
+                    }
+                } else {
+                    await replyWithImage('🚫 Réservé au super admin.');
+                }
                 break;
             case 'promote':
                 if (isGroup) await adminCmds.promote(sock, msg, args, replyWithImage);

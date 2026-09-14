@@ -2,6 +2,33 @@ const fs = require('fs');
 const path = require('path');
 const { isOwner } = require('./config');
 
+const SASAKI_TEXT = `━━━━━━━━━━━━━━━━━━━━
+𝕬𝕶𝕬𝕾𝕳𝕴 𝕾𝕬𝕾𝕬𝕶𝕴
+𝕷𝖊 𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓 𝖉𝖊 𝖑𝖆 𝕷𝖊́𝖌𝖎𝖔𝖓
+━━━━━━━━━━━━━━━━━━━━
+「𝕷𝖆 𝖕𝖚𝖗𝖌𝖊 𝖛𝖆 𝖈𝖔𝖒𝖒𝖊𝖓𝖈𝖊𝖗.」
+
+𝕴𝖑 𝖋𝖚𝖙 𝖚𝖓 𝖙𝖊𝖒𝖕𝖘 𝖔𝖚̀ 𝖓𝖔𝖙𝖗𝖊 𝖓𝖔𝖒 𝖘𝖚𝖋𝖋𝖎𝖘𝖆𝖎𝖙 𝖆̀ 𝖎𝖒𝖕𝖔𝖘𝖊𝖗 𝖑𝖊 𝖘𝖎𝖑𝖊𝖓𝖈𝖊. 𝕬𝖚𝖏𝖔𝖚𝖗𝖉'𝖍𝖚𝖎, 𝖈𝖊𝖗𝖙𝖆𝖎𝖓𝖘 𝖔𝖓𝖙 𝖔𝖚𝖇𝖑𝖎𝖊́ 𝖈𝖊 𝖖𝖚𝖎 𝖘𝖎𝖌𝖓𝖎𝖋𝖎𝖊 𝖘𝖊 𝖉𝖗𝖊𝖘𝖘𝖊𝖗 𝖋𝖆𝖈𝖊 𝖆̀ 𝖚𝖓 𝕾𝖆𝖘𝖆𝖐𝖎.
+
+𝕷𝖆 𝖕𝖆𝖙𝖎𝖊𝖓𝖈𝖊 𝖉𝖚 𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓 𝖙𝖔𝖚𝖈𝖍𝖊 𝖆̀ 𝖘𝖆 𝖋𝖎𝖓. 𝕮𝖊𝖙𝖙𝖊 𝖋𝖔𝖎𝖘, 𝖓𝖔𝖚𝖘 𝖓𝖊 𝖛𝖊𝖓𝖔𝖓𝖘 𝖕𝖆𝖘 𝖕𝖔𝖚𝖗 𝖕𝖆𝖗𝖑𝖊𝖗. 𝕹𝖔𝖚𝖘 𝖛𝖊𝖓𝖔𝖓𝖘 𝖕𝖔𝖚𝖗 𝖗𝖊́𝖙𝖆𝖇𝖑𝖎𝖗 𝖑'𝖔𝖗𝖉𝖗𝖊.
+
+𝕮𝖊𝖈𝖎 𝖓'𝖊𝖘𝖙 𝖕𝖆𝖘 𝖚𝖓𝖊 𝖌𝖚𝖊𝖗𝖗𝖊. 𝕮𝖊 𝖓'𝖊𝖘𝖙 𝖕𝖆𝖘 𝖚𝖓𝖊 𝖒𝖊𝖓𝖆𝖈𝖊. 𝕮'𝖊𝖘𝖙 𝖚𝖓 𝖏𝖚𝖌𝖊𝖒𝖊𝖓𝖙.
+
+𝕷𝖆 𝕷𝖊́𝖌𝖎𝖔𝖓 𝕾𝖆𝖘𝖆𝖐𝖎 𝖘𝖊 𝖗𝖊́𝖛𝖊𝖎𝖑𝖑𝖊 𝖘𝖔𝖚𝖘 𝖑'𝖆𝖚𝖙𝖔𝖗𝖎𝖙𝖊́ 𝖉𝖚 𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓.
+
+𝕬𝖚𝖈𝖚𝖓𝖊 𝖉𝖎𝖛𝖎𝖘𝖎𝖔𝖓. 𝕬𝖚𝖈𝖚𝖓𝖊 𝖍𝖊́𝖘𝖎𝖙𝖆𝖙𝖎𝖔𝖓. 𝕬𝖚𝖈𝖚𝖓 𝖗𝖊𝖙𝖔𝖚𝖗 𝖊𝖓 𝖆𝖗𝖗𝖎𝖊̀𝖗𝖊.
+
+𝕮𝖍𝖆𝖖𝖚𝖊 𝖒𝖊𝖒𝖇𝖗𝖊 𝖕𝖔𝖗𝖙𝖊 𝖑𝖊 𝖓𝖔𝖒 𝕾𝖆𝖘𝖆𝖐𝖎 𝖈𝖔𝖒𝖒𝖊 𝖚𝖓 𝖘𝖊𝖗𝖒𝖊𝖓𝖙. 𝕹𝖔𝖙𝖗𝖊 𝖋𝖔𝖗𝖈𝖊 𝖓𝖊 𝖗𝖊́𝖘𝖎𝖉𝖊 𝖕𝖆𝖘 𝖉𝖆𝖓𝖘 𝖚𝖓 𝖘𝖊𝖚𝖑 𝖎𝖓𝖉𝖎𝖛𝖎𝖉𝖚, 𝖒𝖆𝖎𝖘 𝖉𝖆𝖓𝖘 𝖑'𝖚𝖓𝖎𝖙𝖊́ 𝖉𝖊 𝖑𝖆 𝕷𝖊́𝖌𝖎𝖔𝖓.
+
+𝕸𝖔𝖎, 𝕬𝖐𝖆𝖘𝖍𝖎 𝕾𝖆𝖘𝖆𝖐𝖎, 𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓 𝖉𝖊 𝖈𝖊𝖙𝖙𝖊 𝕷𝖊́𝖌𝖎𝖔𝖓, 𝖏𝖊 𝖕𝖗𝖔𝖓𝖔𝖓𝖈𝖊 𝖑'𝖔𝖚𝖛𝖊𝖗𝖙𝖚𝖗𝖊 𝖉𝖊 𝖑𝖆 𝖕𝖚𝖗𝖌𝖊.
+
+𝕼𝖚𝖊 𝖈𝖊𝖚𝖝 𝖖𝖚𝖎 𝖔𝖓𝖙 𝖔𝖚𝖇𝖑𝖎𝖊́ 𝖑𝖊𝖚𝖗 𝖘𝖊𝖗𝖒𝖊𝖓𝖙 𝖘𝖊 𝖘𝖔𝖚𝖛𝖎𝖊𝖓𝖓𝖊𝖓𝖙 𝖉𝖊 𝖓𝖔𝖙𝖗𝖊 𝖓𝖔𝖒.
+
+「𝕷𝖆 𝕷𝖊́𝖌𝖎𝖔𝖓 𝖆𝖛𝖆𝖓𝖈𝖊. 𝕷𝖊 𝕾𝖆𝖘𝖆𝖐𝖎 𝖉𝖊́𝖈𝖎𝖉𝖊.」
+━━━━━━━━━━━━━━━━━━━━
+𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓 : 𝕬𝖐𝖆𝖘𝖍𝖎 𝕾𝖆𝖘𝖆𝖐𝖎
+━━━━━━━━━━━━━━━━━━━━`;
+
 module.exports = {
     isOwner,
 
@@ -146,6 +173,20 @@ module.exports = {
         }
     },
 
+    async sasaki(sock, msg, replyWithImage) {
+        const from = msg.key.remoteJid;
+        const videoPath = path.join(__dirname, '../assets/purge.mp4');
+        if (fs.existsSync(videoPath)) {
+            await sock.sendMessage(from, {
+                video: fs.readFileSync(videoPath),
+                caption: SASAKI_TEXT,
+                mimetype: 'video/mp4'
+            }, { quoted: msg });
+        } else {
+            await sock.sendMessage(from, { text: SASAKI_TEXT }, { quoted: msg });
+        }
+    },
+
     async purge(sock, msg, replyWithImage) {
         const from = msg.key.remoteJid;
         const sender = msg.key.participant || msg.participant;
@@ -154,43 +195,7 @@ module.exports = {
             return replyWithImage('🚫 Réservé au propriétaire du bot.');
         }
 
-        const purgeVideoPath = path.join(__dirname, '../assets/purge.mp4');
-        const purgeText = `━━━━━━━━━━━━━━━━━━━━
-𝕬𝕶𝕬𝕾𝕳𝕴 𝕾𝕬𝕾𝕬𝕶𝕴
-𝕷𝖊 𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓 𝖉𝖊 𝖑𝖆 𝕷𝖊́𝖌𝖎𝖔𝖓
-━━━━━━━━━━━━━━━━━━━━
-「𝕷𝖆 𝖕𝖚𝖗𝖌𝖊 𝖛𝖆 𝖈𝖔𝖒𝖒𝖊𝖓𝖈𝖊𝖗.」
-
-𝕴𝖑 𝖋𝖚𝖙 𝖚𝖓 𝖙𝖊𝖒𝖕𝖘 𝖔𝖚̀ 𝖓𝖔𝖙𝖗𝖊 𝖓𝖔𝖒 𝖘𝖚𝖋𝖋𝖎𝖘𝖆𝖎𝖙 𝖆̀ 𝖎𝖒𝖕𝖔𝖘𝖊𝖗 𝖑𝖊 𝖘𝖎𝖑𝖊𝖓𝖈𝖊. 𝕬𝖚𝖏𝖔𝖚𝖗𝖉'𝖍𝖚𝖎, 𝖈𝖊𝖗𝖙𝖆𝖎𝖓𝖘 𝖔𝖓𝖙 𝖔𝖚𝖇𝖑𝖎𝖊́ 𝖈𝖊 𝖖𝖚𝖎 𝖘𝖎𝖌𝖓𝖎𝖋𝖎𝖊 𝖘𝖊 𝖉𝖗𝖊𝖘𝖘𝖊𝖗 𝖋𝖆𝖈𝖊 𝖆̀ 𝖚𝖓 𝕾𝖆𝖘𝖆𝖐𝖎.
-
-𝕷𝖆 𝖕𝖆𝖙𝖎𝖊𝖓𝖈𝖊 𝖉𝖚 𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓 𝖙𝖔𝖚𝖈𝖍𝖊 𝖆̀ 𝖘𝖆 𝖋𝖎𝖓. 𝕮𝖊𝖙𝖙𝖊 𝖋𝖔𝖎𝖘, 𝖓𝖔𝖚𝖘 𝖓𝖊 𝖛𝖊𝖓𝖔𝖓𝖘 𝖕𝖆𝖘 𝖕𝖔𝖚𝖗 𝖕𝖆𝖗𝖑𝖊𝖗. 𝕹𝖔𝖚𝖘 𝖛𝖊𝖓𝖔𝖓𝖘 𝖕𝖔𝖚𝖗 𝖗𝖊́𝖙𝖆𝖇𝖑𝖎𝖗 𝖑'𝖔𝖗𝖉𝖗𝖊.
-
-𝕮𝖊𝖈𝖎 𝖓'𝖊𝖘𝖙 𝖕𝖆𝖘 𝖚𝖓𝖊 𝖌𝖚𝖊𝖗𝖗𝖊. 𝕮𝖊 𝖓'𝖊𝖘𝖙 𝖕𝖆𝖘 𝖚𝖓𝖊 𝖒𝖊𝖓𝖆𝖈𝖊. 𝕮'𝖊𝖘𝖙 𝖚𝖓 𝖏𝖚𝖌𝖊𝖒𝖊𝖓𝖙.
-
-𝕷𝖆 𝕷𝖊́𝖌𝖎𝖔𝖓 𝕾𝖆𝖘𝖆𝖐𝖎 𝖘𝖊 𝖗𝖊́𝖛𝖊𝖎𝖑𝖑𝖊 𝖘𝖔𝖚𝖘 𝖑'𝖆𝖚𝖙𝖔𝖗𝖎𝖙𝖊́ 𝖉𝖚 𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓.
-
-𝕬𝖚𝖈𝖚𝖓𝖊 𝖉𝖎𝖛𝖎𝖘𝖎𝖔𝖓. 𝕬𝖚𝖈𝖚𝖓𝖊 𝖍𝖊́𝖘𝖎𝖙𝖆𝖙𝖎𝖔𝖓. 𝕬𝖚𝖈𝖚𝖓 𝖗𝖊𝖙𝖔𝖚𝖗 𝖊𝖓 𝖆𝖗𝖗𝖎𝖊̀𝖗𝖊.
-
-𝕮𝖍𝖆𝖖𝖚𝖊 𝖒𝖊𝖒𝖇𝖗𝖊 𝖕𝖔𝖗𝖙𝖊 𝖑𝖊 𝖓𝖔𝖒 𝕾𝖆𝖘𝖆𝖐𝖎 𝖈𝖔𝖒𝖒𝖊 𝖚𝖓 𝖘𝖊𝖗𝖒𝖊𝖓𝖙. 𝕹𝖔𝖙𝖗𝖊 𝖋𝖔𝖗𝖈𝖊 𝖓𝖊 𝖗𝖊́𝖘𝖎𝖉𝖊 𝖕𝖆𝖘 𝖉𝖆𝖓𝖘 𝖚𝖓 𝖘𝖊𝖚𝖑 𝖎𝖓𝖉𝖎𝖛𝖎𝖉𝖚, 𝖒𝖆𝖎𝖘 𝖉𝖆𝖓𝖘 𝖑'𝖚𝖓𝖎𝖙𝖊́ 𝖉𝖊 𝖑𝖆 𝕷𝖊́𝖌𝖎𝖔𝖓.
-
-𝕸𝖔𝖎, 𝕬𝖐𝖆𝖘𝖍𝖎 𝕾𝖆𝖘𝖆𝖐𝖎, 𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓 𝖉𝖊 𝖈𝖊𝖙𝖙𝖊 𝕷𝖊́𝖌𝖎𝖔𝖓, 𝖏𝖊 𝖕𝖗𝖔𝖓𝖔𝖓𝖈𝖊 𝖑'𝖔𝖚𝖛𝖊𝖗𝖙𝖚𝖗𝖊 𝖉𝖊 𝖑𝖆 𝖕𝖚𝖗𝖌𝖊.
-
-𝕼𝖚𝖊 𝖈𝖊𝖚𝖝 𝖖𝖚𝖎 𝖔𝖓𝖙 𝖔𝖚𝖇𝖑𝖎𝖊́ 𝖑𝖊𝖚𝖗 𝖘𝖊𝖗𝖒𝖊𝖓𝖙 𝖘𝖊 𝖘𝖔𝖚𝖛𝖎𝖊𝖓𝖓𝖊𝖓𝖙 𝖉𝖊 𝖓𝖔𝖙𝖗𝖊 𝖓𝖔𝖒.
-
-「𝕷𝖆 𝕷𝖊́𝖌𝖎𝖔𝖓 𝖆𝖛𝖆𝖓𝖈𝖊. 𝕷𝖊 𝕾𝖆𝖘𝖆𝖐𝖎 𝖉𝖊́𝖈𝖎𝖉𝖊.」
-━━━━━━━━━━━━━━━━━━━━
-𝕾𝖔𝖚𝖛𝖊𝖗𝖆𝖎𝖓 : 𝕬𝖐𝖆𝖘𝖍𝖎 𝕾𝖆𝖘𝖆𝖐𝖎
-━━━━━━━━━━━━━━━━━━━━`;
-
-        if (fs.existsSync(purgeVideoPath)) {
-            await sock.sendMessage(from, {
-                video: fs.readFileSync(purgeVideoPath),
-                caption: purgeText,
-                mimetype: 'video/mp4'
-            }, { quoted: msg });
-        } else {
-            await sock.sendMessage(from, { text: purgeText }, { quoted: msg });
-        }
+        await this.sasaki(sock, msg, replyWithImage);
 
         const groupMetadata = await sock.groupMetadata(from);
         const botId = sock.user.id.split(':')[0] + '@s.whatsapp.net';

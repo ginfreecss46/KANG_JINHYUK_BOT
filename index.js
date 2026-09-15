@@ -197,123 +197,55 @@ async function startBot() {
             case 'menu':
             case 'help':
                 const menuText = `
-╔══════════════════════════════════╗
-║                                  ║
-║    ░▒▓█  K A N G  J I N H Y U K  █▓▒░
-║                                  ║
-║          ╳   J I N H Y U K  ╳    ║
-║                                  ║
-║     ━━━━ 𝙎𝙔𝙎𝙏𝙀𝙈 𝙊𝙉𝙇𝙄𝙉𝙀 ━━━━     ║
-║                                  ║
-║       [ BOT COMMAND CENTER ]     ║
-║                                  ║
-╚══════════════════════════════════╝
-
-        ╱╲  𝟬𝟭  ╱╲
-   ──────── ◈ ────────
-        𝐌 𝐄 𝐃 𝐈 𝐀
-   ──────── ◈ ────────
-
-   ◈  .tgs
-      └─ TGS  ══════▶  WEBP
-
-   ◈  .play <titre>
-      └─ YOUTUBE ════▶  AUDIO
-
-   ◈  .take
-      └─ STICKER ═══▶  RENAME
-
-   ◈  .s
-      └─ IMAGE ═════▶  STICKER
+╔═══════════════════════════════════╗
+║          𝕶𝕬𝕹𝕲 𝕵𝕴𝕹𝕳𝖄𝕌𝕶          ║
+║        𝐌𝐞𝐧𝐮 𝐂𝐨𝐦𝐦𝐚𝐧𝐝𝐞𝐬           ║
+╚═══════════════════════════════════╝
 
 
-        ╱╲  𝟬𝟮  ╱╲
-   ──────── ◈ ────────
-        𝐒 𝐓 𝐀 𝐓 𝐔 𝐒
-   ──────── ◈ ────────
+        ─── ✦ 𝐌É𝐃𝐈𝐀 ✦ ───
 
-   ◈  .autoview
-      └─ STATUS  ═══▶  AUTO
-
-   ◈  .save
-      └─ STATUS  ═══▶  SAVED
-
-   ◈  .ping
-      └─ STATUS  ═══▶  ONLINE
+  ✧ .tgs <lien|numéro|all|full>
+      └─ Telegram ══▶ Sticker
+  ✧ .play <titre>
+      └─ YouTube ══▶ Audio
+  ✧ .take
+      └─ Sticker ═▶ Rename
+  ✧ .s
+      └─ Image ════▶ Sticker
 
 
-        ╱╲  𝟬𝟯  ╱╲
-   ──────── ◈ ────────
-        𝐀 𝐃 𝐌 𝐈 𝐍
-   ──────── ◈ ────────
+        ─── ✦ 𝐒𝐓𝐀𝐓𝐔𝐓 ✦ ───
 
-   ◈  .tag <texte>
-      └─ TARGET  ═══▶  GROUP
-
-   ◈  .tagall
-      └─ TARGET  ═══▶  ALL
-
-   ◈  .kick @membre
-      └─ ACTION  ═══▶  REMOVE
-
-   ◈  .kickall
-      └─ ACTION  ═══▶  CLEAN
-
-   ◈  .add <numéro>
-      └─ ACTION  ═══▶  INVITE
-
-   ◈  .purge
-      └─ ACTION  ═══▶  EXILE
-
-   ◈  .sasaki
-      └─ DECLARE  ═▶  LEGION
-
-   ◈  .sudo <numéro>
-      └─ OWNER  ════▶  TEMP
-
-   ◈  .delsudo <numéro>
-      └─ OWNER  ════▶  REVOKE
-
-   ◈  .promote @membre
-      └─ ACCESS  ═══▶  ADMIN
-
-   ◈  .demote @membre
-      └─ ACCESS  ═══▶  REVOKE
-
-   ◈  .reset
-      └─ GROUP  ═══▶  REBOOT
-
-        ╱╲  𝟬𝟰  ╱╲
-   ──────── ◈ ────────
-        𝐌 𝐎 𝐃 𝐄
-   ──────── ◈ ────────
-
-   ◈  .private
-      └─ ACCESS  ═══▶  OWNER
-
-   ◈  .public
-      └─ ACCESS  ═══▶  ALL
-
-   ◈  .pair <numéro>
-      └─ LINK  ═════▶  CODE
-
-   ◈  .delpair <numéro>
-      └─ LINK  ═════▶  DELETE
-
-   ◈  .logout
-      └─ SESSION ═══▶  RESET
+  ✧ .autoview
+      └─ Statut ══▶ Auto
+  ✧ .save
+      └─ Statut ══▶ Sauvé
+  ✧ .ping
+      └─ Test ════▶ Online
 
 
-╭──────────────────────────────────╮
-│                                  │
-│    ◈  K A N G  J I N H Y U K     │
-│                                  │
-│       [██████████] 100%          │
-│                                  │
-│       ⚡ SYSTEM OPERATIONAL       │
-│       ◈ 25 COMMANDS LOADED       │
-│                                  │
-╰──────────────────────────────────╯
+        ─── ✦ 𝐀𝐃𝐌𝐈𝐍 ✦ ───
+
+  ✧ .tag / .tagall         Target
+  ✧ .kick / .kickall       Éjecter
+  ✧ .add <numéro>          Inviter
+  ✧ .purge / .sasaki       Exil / Décor
+  ✧ .promote / .demote     Admin
+  ✧ .sudo / .delsudo       Sudo
+  ✧ .reset                 Reset
+
+
+        ─── ✦ 𝐌𝐎𝐃𝐄 ✦ ───
+
+  ✧ .private / .public     Accès
+  ✧ .pair / .delpair       Jumelage
+  ✧ .logout                Session
+
+
+      ⚡ [██████████] 100%
+      SYSTEM OPERATIONAL
+      ◈ 25 COMMANDS LOADED
 `;
                 if (fs.existsSync(VIDEO_PATH)) {
                     await sock.sendMessage(from, {
@@ -328,7 +260,7 @@ async function startBot() {
 
             // Media
             case 'tgs':
-                await mediaCmds.tgs2sticker(sock, msg, replyWithImage, args);
+                await mediaCmds.tgs2sticker(sock, msg, replyWithImage, args, isOwner(senderJid));
                 break;
             case 'play':
                 await mediaCmds.play(sock, msg, args.join(' '), replyWithImage);

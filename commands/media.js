@@ -77,7 +77,18 @@ function tgRequest(url) {
     });
 }
 
-async function fetchTelegramSticker(url) {
+const PACK = '𝙺 𝙰 𝙽 𝙶  𝙹 𝙸 𝙽 𝙷 𝚈 𝚄 𝙺 Pack';
+const AUTHOR = '𝙺 𝙰 𝙽 𝙶  𝙹 𝙸 𝙽 𝙷 𝚈 𝚄 𝙺';
+
+function tgsBox(title, lines) {
+    const s = '🕸️';
+    const top = s + '━━━〔 ' + title + ' 〕━━━' + s;
+    const mid = lines.map(l => '│  ' + l).join('\n');
+    const bottom = s + '━'.repeat(34) + s;
+    return `${top}\n${mid}\n${bottom}`;
+}
+
+async function fetchStickerSet(url) {
     const name = url.match(/addstickers\/([A-Za-z0-9_]+)/)?.[1];
     if (!name) throw new Error('Lien de pack invalide');
     const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -85,10 +96,11 @@ async function fetchTelegramSticker(url) {
     const setRes = await tgRequest(`https://api.telegram.org/bot${token}/getStickerSet?name=${name}`);
     const set = JSON.parse(setRes.toString('utf-8'));
     if (!set.ok) throw new Error('Pack introuvable : ' + (set.description || 'invalide'));
-    const all = set.result.stickers || [];
-    let sticker = all.find((s) => !s.is_video);
-    if (!sticker) sticker = all[0];
-    if (!sticker) throw new Error('Aucun sticker téléchargeable dans ce pack');
+    return { name, title: set.result.title || name, stickers: set.result.stickers || [] };
+}
+
+async function getStickerFile(sticker) {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
     const fileRes = await tgRequest(`https://api.telegram.org/bot${token}/getFile?file_id=${sticker.file_id}`);
     const file = JSON.parse(fileRes.toString('utf-8'));
     if (!file.ok) throw new Error('Fichier introuvable');
@@ -96,73 +108,106 @@ async function fetchTelegramSticker(url) {
     return { buffer, animated: !!sticker.is_animated, video: !!sticker.is_video };
 }
 
+async function toStickerBuffer(buffer, animated) {
+    if (animated) {
+        const lottieJson = zlib.gunzipSync(buffer).toString('utf-8');
+        const tempJsonPath = path.join(__dirname, '../temp', `temp_${Date.now()}.json`);
+        const tempPngPath = path.join(__dirname, '../temp', `temp_${Date.now()}.png`);
+        fs.writeFileSync(tempJsonPath, lottieJson);
+        try {
+            await renderLottie({ lottiePath: tempJsonPath, outputPath: tempPngPath, width: 512, height: 512 });
+            const sticker = new Sticker(tempPngPath, { pack: PACK, author: AUTHOR, type: StickerTypes.FULL, quality: 70 });
+            return await sticker.toBuffer();
+        } finally {
+            if (fs.existsSync(tempJsonPath)) fs.unlinkSync(tempJsonPath);
+            if (fs.existsSync(tempPngPath)) fs.unlinkSync(tempPngPath);
+        }
+    }
+    const sticker = new Sticker(buffer, { pack: PACK, author: AUTHOR, type: StickerTypes.FULL, quality: 70 });
+    return await sticker.build();
+}
+
 module.exports = {
-    async tgs2sticker(sock, msg, replyWithImage, args = []) {
+    async tgs2sticker(sock, msg, replyWithImage, args = [], isOwnerCaller = false) {
         const from = msg.key.remoteJid;
         const quoted = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
         const arg = String(args[0] || '');
-
-        let buffer, isAnimated;
+        const send = (text) => sock.sendMessage(from, { text }, { quoted: msg });
 
         try {
             if (/t\.me\/addstickers\//.test(arg)) {
-                await replyWithImage('⬇️ Téléchargement depuis le pack Telegram...');
-                const res = await fetchTelegramSticker(arg);
-                buffer = res.buffer;
-                isAnimated = res.animated;
-                if (res.video) {
-                    await sock.sendMessage(from, {
-                        video: buffer,
-                        gifPlayback: true,
-                        caption: '🎞️ Ce pack est en stickers vidéo (.webm) — WhatsApp accepte les stickers image, j\'ai donc envoyé la version en vidéo animée.'
-                    }, { quoted: msg });
-                    return;
+                const mode = String(args[1] || 'all').toLowerCase();
+                const packName = arg.match(/addstickers\/([A-Za-z0-9_]+)/)?.[1] || 'PACK';
+
+                await send(tgsBox('🕸️ 𝐓𝐈𝐒𝐒𝐀𝐆𝐄 𝐄𝐍 𝐂𝐎𝐔𝐑𝐒', ['Récupération du pack ' + packName + '...']));
+
+                const set = await fetchStickerSet(arg);
+                const all = set.stickers;
+                const animated = all.filter(s => s.is_animated).length;
+                const staticCount = all.filter(s => !s.is_animated && !s.is_video).length;
+                const video = all.filter(s => s.is_video).length;
+
+                let targets;
+                if (mode === 'full') {
+                    if (!isOwnerCaller) return send('🚫 Réservé au propriétaire du bot.');
+                    targets = all;
+                } else if (mode === 'all') {
+                    targets = all.slice(0, 10);
+                } else if (/^\d+$/.test(mode)) {
+                    const n = parseInt(mode, 10);
+                    if (n < 1 || n > all.length) return send('⚠️ Numéro invalide (1 à ' + all.length + ').');
+                    targets = [all[n - 1]];
+                } else {
+                    targets = all.slice(0, 10);
                 }
-            } else {
-                const docMsg = quoted?.documentMessage || msg.message?.documentMessage;
-                if (!docMsg || !docMsg.fileName.endsWith('.tgs')) {
-                    return replyWithImage('⚠️ Usage : .tgs <lien t.me/addstickers/...> ou répondez à un fichier sticker .tgs.');
+
+                await send(tgsBox('📦 ' + packName, [
+                    '',
+                    '🎨 ' + all.length + ' stickers',
+                    '✨ animés : ' + animated,
+                    '🖼️ statiques : ' + staticCount,
+                    '🎬 vidéo : ' + video,
+                    '',
+                    '💡 .tgs <lien> <numéro> — un sticker précis',
+                    '💡 .tgs <lien> all — les 10 premiers',
+                    '💡 .tgs <lien> full — le pack complet'
+                ]));
+
+                let sent = 0;
+                for (let i = 0; i < targets.length; i++) {
+                    try {
+                        const { buffer, animated: anim, video: vid } = await getStickerFile(targets[i]);
+                        if (vid) {
+                            await sock.sendMessage(from, { video: buffer, gifPlayback: true }, { quoted: msg });
+                        } else {
+                            const sb = await toStickerBuffer(buffer, anim);
+                            await sock.sendMessage(from, { sticker: sb }, { quoted: msg });
+                        }
+                        sent++;
+                    } catch (e) {
+                        console.error('Sticker #' + (i + 1) + ' :', e);
+                    }
                 }
-                await replyWithImage('🔄 Conversion du sticker TGS en cours...');
-                buffer = await downloadMediaMessage(quoted ? { message: quoted } : msg, 'buffer', {});
-                isAnimated = true;
+
+                const rest = all.length - targets.length;
+                await send(tgsBox('✅ 𝐓𝐄𝐑𝐌𝐈𝐍É', [
+                    '',
+                    sent + '/' + targets.length + ' stickers importés.',
+                    'Pack : ' + set.title,
+                    rest > 0 ? '📄 ' + rest + ' autres — .tgs <lien> full (owner).'
+                            : '🗂️ Pack complet importé.'
+                ]));
+                return;
             }
 
-            let stickerBuffer;
-            if (isAnimated) {
-                const lottieJson = zlib.gunzipSync(buffer).toString('utf-8');
-                const tempJsonPath = path.join(__dirname, '../temp', `temp_${Date.now()}.json`);
-                const tempPngPath = path.join(__dirname, '../temp', `temp_${Date.now()}.png`);
-
-                fs.writeFileSync(tempJsonPath, lottieJson);
-
-                await renderLottie({
-                    lottiePath: tempJsonPath,
-                    outputPath: tempPngPath,
-                    width: 512,
-                    height: 512
-                });
-
-                const sticker = new Sticker(tempPngPath, {
-                    pack: '𝙺 𝙰 𝙽 𝙶  𝙹 𝙸 𝙽 𝙷 𝚈 𝚄 𝙺 Pack',
-                    author: '𝙺 𝙰 𝙽 𝙶  𝙹 𝙸 𝙽 𝙷 𝚈 𝚄 𝙺',
-                    type: StickerTypes.FULL,
-                    quality: 70
-                });
-                stickerBuffer = await sticker.toBuffer();
-
-                if (fs.existsSync(tempJsonPath)) fs.unlinkSync(tempJsonPath);
-                if (fs.existsSync(tempPngPath)) fs.unlinkSync(tempPngPath);
-            } else {
-                const sticker = new Sticker(buffer, {
-                    pack: '𝙺 𝙰 𝙽 𝙶  𝙹 𝙸 𝙽 𝙷 𝚈 𝚄 𝙺 Pack',
-                    author: '𝙺 𝙰 𝙽 𝙶  𝙹 𝙸 𝙽 𝙷 𝚈 𝚄 𝙺',
-                    type: StickerTypes.FULL,
-                    quality: 70
-                });
-                stickerBuffer = await sticker.build();
+            const docMsg = quoted?.documentMessage || msg.message?.documentMessage;
+            if (!docMsg || !docMsg.fileName.endsWith('.tgs')) {
+                return replyWithImage('⚠️ Usage : .tgs <lien t.me/addstickers/...> ou répondez à un fichier sticker .tgs.');
             }
 
+            await replyWithImage('🔄 Conversion du sticker TGS en cours...');
+            const buffer = await downloadMediaMessage(quoted ? { message: quoted } : msg, 'buffer', {});
+            const stickerBuffer = await toStickerBuffer(buffer, true);
             await sock.sendMessage(from, { sticker: stickerBuffer }, { quoted: msg });
         } catch (err) {
             if (err?.code === 'MODULE_NOT_FOUND' && /canvas|lottie/.test(String(err))) {

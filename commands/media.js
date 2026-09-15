@@ -178,7 +178,7 @@ module.exports = {
                     try {
                         const { buffer, animated: anim, video: vid } = await getStickerFile(targets[i]);
                         if (vid) {
-                            await sock.sendMessage(from, { video: buffer, gifPlayback: true }, { quoted: msg });
+                            await sock.sendMessage(from, { sticker: buffer, mimetype: 'video/webp' }, { quoted: msg });
                         } else {
                             const sb = await toStickerBuffer(buffer, anim);
                             await sock.sendMessage(from, { sticker: sb }, { quoted: msg });

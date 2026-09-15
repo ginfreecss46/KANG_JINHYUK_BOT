@@ -6,6 +6,26 @@ const http = require('http');
 const qrcode = require('qrcode-terminal');
 require('dotenv').config();
 
+// Filtre le bruit de libsignal/Baileys (messages de session inoffensifs) hors console
+const __rawError = console.error.bind(console);
+const __rawInfo = console.info.bind(console);
+const __rawWarn = console.warn.bind(console);
+console.error = (...a) => {
+    const s = String(a[0] || '');
+    if (s.includes('Failed to decrypt message') || s.startsWith('Session error:')) return;
+    __rawError(...a);
+};
+console.info = (...a) => {
+    const s = String(a[0] || '');
+    if (s.includes('Closing session')) return;
+    __rawInfo(...a);
+};
+console.warn = (...a) => {
+    const s = String(a[0] || '');
+    if (s.includes('Decrypted message with closed session')) return;
+    __rawWarn(...a);
+};
+
 // Import des modules de commandes
 const adminCmds = require('./commands/admin');
 const mediaCmds = require('./commands/media');

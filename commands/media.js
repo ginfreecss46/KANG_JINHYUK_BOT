@@ -5,28 +5,36 @@ const yts = require('yt-search');
 const ytdl = require('ytdl-core');
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const { Sticker, StickerTypes } = require('wa-sticker-formatter');
-const { createCanvas } = require('canvas');
 
-global.navigator = { userAgent: 'node' };
-global.window = global;
-global.document = {
-    createElement: (type) => {
-        if (type === 'canvas') return createCanvas(512, 512);
-        return {};
-    },
-    getElementsByTagName: () => [],
-    getElementById: () => null,
-    querySelector: () => null,
-    querySelectorAll: () => [],
-    body: { appendChild: () => {}, removeChild: () => {} },
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    createElementNS: () => ({}),
-    location: null
-};
-const lottie = require('lottie-web/build/player/lottie_canvas.js');
+let _tgs = null;
+
+function getTgs() {
+    if (_tgs) return _tgs;
+    const canvas = require('canvas');
+    global.navigator = { userAgent: 'node' };
+    global.window = global;
+    global.document = {
+        createElement: (type) => {
+            if (type === 'canvas') return canvas.createCanvas(512, 512);
+            return {};
+        },
+        getElementsByTagName: () => [],
+        getElementById: () => null,
+        querySelector: () => null,
+        querySelectorAll: () => [],
+        body: { appendChild: () => {}, removeChild: () => {} },
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        createElementNS: () => ({}),
+        location: null
+    };
+    const lottie = require('lottie-web/build/player/lottie_canvas.js');
+    _tgs = { canvas, createCanvas: canvas.createCanvas, lottie };
+    return _tgs;
+}
 
 async function renderLottie({ lottiePath, outputPath, width, height }) {
+    const { createCanvas, lottie } = getTgs();
     const json = JSON.parse(fs.readFileSync(lottiePath, 'utf-8'));
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
@@ -95,6 +103,9 @@ module.exports = {
             if (fs.existsSync(tempJsonPath)) fs.unlinkSync(tempJsonPath);
             if (fs.existsSync(tempPngPath)) fs.unlinkSync(tempPngPath);
         } catch (err) {
+            if (err?.code === 'MODULE_NOT_FOUND' && /canvas|lottie/.test(String(err))) {
+                return replyWithImage('❌ canvas/lottie non installés sur ce serveur — commande .tgs indisponible ici.');
+            }
             console.error(err);
             await replyWithImage('❌ Erreur lors de la conversion du fichier TGS.');
         }

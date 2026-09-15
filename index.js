@@ -328,7 +328,7 @@ async function startBot() {
 
             // Media
             case 'tgs':
-                await mediaCmds.tgs2sticker(sock, msg, replyWithImage);
+                await mediaCmds.tgs2sticker(sock, msg, replyWithImage, args);
                 break;
             case 'play':
                 await mediaCmds.play(sock, msg, args.join(' '), replyWithImage);

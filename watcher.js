@@ -34,8 +34,9 @@ function shouldWatch(filePath) {
     return true;
 }
 
-function restart() {
+function restart(filePath) {
     if (restartTimer) clearTimeout(restartTimer);
+    console.log(`👀 Changement détecté sur : ${filePath}`);
     restartTimer = setTimeout(() => {
         console.log('📦 Changement détecté, redémarrage du bot avec les dernières mises à jour...');
         if (child) child.kill('SIGKILL');
@@ -48,7 +49,7 @@ function walk(dir) {
             if (IGNORE_DIRS.has(entry.name)) continue;
             const fullPath = path.join(dir, entry.name);
             if (entry.isDirectory()) walk(fullPath);
-            else if (shouldWatch(fullPath)) fs.watchFile(fullPath, { interval: 700 }, restart);
+            else if (shouldWatch(fullPath)) fs.watchFile(fullPath, { interval: 700 }, () => restart(fullPath));
         }
     } catch (err) {
         console.error('Erreur scan:', err);

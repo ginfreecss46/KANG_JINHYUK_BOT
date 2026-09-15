@@ -33,6 +33,10 @@ module.exports = {
             return replyWithImage('⚠️ Usage : .pair <numéro>. Ex : .pair 243812345678');
         }
 
+        if (sock.user) {
+            return replyWithImage('ℹ️ Le bot est déjà connecté. Envoyez .logout puis scannez le nouveau QR pour relier un autre numéro.');
+        }
+
         try {
             const code = await sock.requestPairingCode(phone);
             const pairing = loadPairing();

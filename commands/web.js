@@ -211,6 +211,7 @@ border-top:1px solid var(--border);letter-spacing:1px;position:relative;z-index:
     <div class="cmd"><i data-lucide="globe"></i><div><span>.public</span><small>Mode ouvert</small></div></div>
     <div class="cmd"><i data-lucide="link"></i><div><span>.pair</span><small>Jumeler un numéro</small></div></div>
     <div class="cmd"><i data-lucide="unlink"></i><div><span>.delpair</span><small>Supprimer jumelage</small></div></div>
+    <div class="cmd"><i data-lucide="log-out"></i><div><span>.logout</span><small>Réinitialiser la session</small></div></div>
   </div>
 </section>
 
@@ -363,6 +364,10 @@ async function handle(req, res) {
     }
 
     if (req.method === 'GET' && url === '/api/qr') {
+        if (state.connected) {
+            json(res, 200, { qr: null, error: 'Le bot est déjà connecté. Pour relier un autre numéro, envoyez .logout au bot puis relancez cette page.' });
+            return;
+        }
         try {
             const qr = await spawnLinkSocket();
             const dataUrl = await QRCode.toDataURL(qr, { width: 300, margin: 2 });
@@ -382,13 +387,17 @@ async function handle(req, res) {
                 const { phone } = JSON.parse(body || '{}');
                 const cleanPhone = String(phone || '').replace(/[^\d]/g, '');
                 if (!cleanPhone) return json(res, 400, { ok: false, error: 'Numéro invalide.' });
+                if (state.connected) return json(res, 400, { ok: false, error: 'Le bot est déjà connecté. Envoyez .logout au bot pour déconnecter avant de jumeler un autre numéro.' });
                 if (!state.sock) return json(res, 400, { ok: false, error: 'Le bot n\'est pas encore prêt. Réessayez dans quelques secondes.' });
                 const rawCode = await state.sock.requestPairingCode(cleanPhone);
                 const code = rawCode.match(/.{1,4}/g).join('-');
                 json(res, 200, { ok: true, code });
             } catch (err) {
                 console.error('Erreur pairing :', err);
-                json(res, 500, { ok: false, error: 'Impossible de générer le code. Vérifiez le numéro (indicatif pays requis).' });
+                const friendly = err.isBoom && err.output?.statusCode === 428
+                    ? 'Le bot est déjà connecté (session active). Envoyez .logout pour jumeler un nouveau numéro.'
+                    : 'Impossible de générer le code. Vérifiez le numéro (indicatif pays requis).';
+                json(res, 500, { ok: false, error: friendly });
             }
         });
         return;

@@ -160,6 +160,21 @@ async function startBot() {
                 if (isOwner(senderJid)) await pairCmds.delpair(sock, msg, args, replyWithImage);
                 break;
 
+            case 'logout':
+                if (isOwner(senderJid)) {
+                    try {
+                        await sock.sendMessage(from, { text: '👋 Déconnexion en cours... Un nouveau QR sera affiché.' }, { quoted: msg });
+                    } catch (e) {}
+                    setTimeout(async () => {
+                        try { await sock.logout(); } catch (e) {}
+                        try { fs.rmSync(path.join(__dirname, 'auth_info_baileys'), { recursive: true, force: true }); } catch (e) {}
+                        process.exit(0);
+                    }, 1200);
+                } else {
+                    await replyWithImage('🚫 Réservé au propriétaire du bot.');
+                }
+                break;
+
             // Modes d'accès
             case 'private':
                 if (isOwner(senderJid)) {
@@ -285,6 +300,9 @@ async function startBot() {
    ◈  .delpair <numéro>
       └─ LINK  ═════▶  DELETE
 
+   ◈  .logout
+      └─ SESSION ═══▶  RESET
+
 
 ╭──────────────────────────────────╮
 │                                  │
@@ -293,7 +311,7 @@ async function startBot() {
 │       [██████████] 100%          │
 │                                  │
 │       ⚡ SYSTEM OPERATIONAL       │
-│       ◈ 24 COMMANDS LOADED       │
+│       ◈ 25 COMMANDS LOADED       │
 │                                  │
 ╰──────────────────────────────────╯
 `;

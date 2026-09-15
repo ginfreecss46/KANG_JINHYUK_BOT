@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const MODE_PATH = path.join(__dirname, '../temp/bot_mode.json');
 const SUDO_PATH = path.join(__dirname, '../temp/sudo.json');
+const IDENTITY_PATH = path.join(__dirname, '../auth_info_baileys/creds.json');
 
 const OWNERS = (process.env.OWNERS || '')
     .split(',')
@@ -20,6 +21,25 @@ function normalize(jid) {
 function isSuperAdmin(sender) {
     return SUPER_ADMIN.includes(normalize(sender));
 }
+
+// Identité réelle du compte bot (creds.json) : son PN ET son LID.
+// Sur WhatsApp, le propriétaire arrive souvent via son LID — les deux doivent compter comme owner.
+function readOwnIdentity() {
+    try {
+        const c = JSON.parse(fs.readFileSync(IDENTITY_PATH, 'utf-8'));
+        const ids = [];
+        if (c.me) {
+            if (c.me.id) ids.push(normalize(c.me.id));
+            if (c.me.registeredJid) ids.push(normalize(c.me.registeredJid));
+            if (c.me.lid) ids.push(normalize(c.me.lid));
+        }
+        return ids;
+    } catch (err) {
+        return [];
+    }
+}
+const OWN_IDENTITY = readOwnIdentity();
+if (OWN_IDENTITY.length) console.log('[AUTH] identité bot (owner) →', OWN_IDENTITY.join(', '));
 
 // Owners temporaires (sudo)
 function loadSudo() {
@@ -38,7 +58,7 @@ function saveSudo(list) {
 
 function isOwner(sender) {
     const n = normalize(sender);
-    return SUPER_ADMIN.includes(n) || OWNERS.includes(n) || loadSudo().includes(n);
+    return SUPER_ADMIN.includes(n) || OWNERS.includes(n) || OWN_IDENTITY.includes(n) || loadSudo().includes(n);
 }
 
 function addSudo(phone) {

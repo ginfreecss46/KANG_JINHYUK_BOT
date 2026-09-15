@@ -17,7 +17,7 @@ console.error = (...a) => {
 };
 console.info = (...a) => {
     const s = String(a[0] || '');
-    if (s.includes('Closing session')) return;
+    if (s.includes('Closing session') || s.includes('in favor of incoming prekey')) return;
     __rawInfo(...a);
 };
 console.warn = (...a) => {

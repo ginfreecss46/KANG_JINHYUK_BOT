@@ -81,7 +81,7 @@ const PACK = '𝙺 𝙰 𝙽 𝙶  𝙹 𝙸 𝙽 𝙷 𝚈 𝚄 𝙺 Pack';
 const AUTHOR = '𝙺 𝙰 𝙽 𝙶  𝙹 𝙸 𝙽 𝙷 𝚈 𝚄 𝙺';
 
 function tgsBox(title, lines) {
-    const s = '🕸️';
+    const s = '👻';
     const top = s + '━━━〔 ' + title + ' 〕━━━' + s;
     const mid = lines.map(l => '│  ' + l).join('\n');
     const bottom = s + '━'.repeat(34) + s;
@@ -139,7 +139,7 @@ module.exports = {
                 const mode = String(args[1] || 'all').toLowerCase();
                 const packName = arg.match(/addstickers\/([A-Za-z0-9_]+)/)?.[1] || 'PACK';
 
-                await send(tgsBox('🕸️ 𝐓𝐈𝐒𝐒𝐀𝐆𝐄 𝐄𝐍 𝐂𝐎𝐔𝐑𝐒', ['Récupération du pack ' + packName + '...']));
+                await send(tgsBox('👻 𝐓𝐈𝐒𝐒𝐀𝐆𝐄 𝐄𝐍 𝐂𝐎𝐔𝐑𝐒', ['Récupération du pack ' + packName + '...']));
 
                 const set = await fetchStickerSet(arg);
                 const all = set.stickers;

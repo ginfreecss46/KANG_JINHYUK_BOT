@@ -197,34 +197,34 @@ async function startBot() {
             case 'menu':
             case 'help':
                 const menuText = `
-🕸️━━━〔 🕸️ 𝕶𝕬𝕹𝕲 𝕵𝕴𝕹𝕳𝖄𝕌𝕶 〕━━━🕸️
+👻━━━〔 👻 𝕶𝕬𝕹𝕲 𝕵𝕴𝕹𝕳𝖄𝕌𝕶 〕━━━👻
 │
 │  ⚡ 𝐌𝐞𝐧𝐮 𝐂𝐨𝐦𝐦𝐚𝐧𝐝𝐞𝐬 — 25
 │
-│   🕸️ 𝐌É𝐃𝐈𝐀
+│   👻 𝐌É𝐃𝐈𝐀
 │   ✦ .tgs <lien|numéro|all|full>
 │   ✦ .play <titre>      audio
 │   ✦ .take              renommer
 │   ✦ .s                 sticker
 │
-│   🕸️ 𝐒𝐓𝐀𝐓𝐔𝐓
+│   👻 𝐒𝐓𝐀𝐓𝐔𝐓
 │   ✦ .autoview / .save / .ping
 │
-│   🕸️ 𝐀𝐃𝐌𝐈𝐍
+│   👻 𝐀𝐃𝐌𝐈𝐍
 │   ✦ .tag / .tagall           target
 │   ✦ .kick / .kickall / .add  éjecter
 │   ✦ .purge / .sasaki         exil
 │   ✦ .promote / .demote       admin
 │   ✦ .sudo / .delsudo / .reset
 │
-│   🕸️ 𝐌𝐎𝐃𝐄
+│   👻 𝐌𝐎𝐃𝐄
 │   ✦ .private / .public       accès
 │   ✦ .pair / .delpair         jumelage
 │   ✦ .logout                  session
 │
 │   ✅ [██████████] 100%
 │   ⚡ SYSTEM OPERATIONAL
-🕸️━━━〔 🕸️ 25 COMMANDS LOADED 〕━━━🕸️
+👻━━━〔 👻 25 COMMANDS LOADED 〕━━━👻
 `;
                 if (fs.existsSync(VIDEO_PATH)) {
                     await sock.sendMessage(from, {
